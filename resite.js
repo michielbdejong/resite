@@ -16,6 +16,9 @@ var http = require('http'),
 http.createServer(function(req, res) {
   if (req.url.substr(-1) === '/') {
     req.url += 'index.html';
+    res.writeHead(200, {
+      'Content-Type': 'text/html'
+    });
   }
   console.log('store.getItem', userName, 'content:'+sitepath+ req.url);
   store.getItem(userName, 'content:'+sitepath+ req.url, function(err, content) {
