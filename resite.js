@@ -9,19 +9,34 @@ var http = require('http'),
     sitepath = '/public/www/michielbdejong.com',
     certpath = '/tls/michielbdejong.com';
 
-//store.putItem(userName, 'content:/public/www/michielbdejong.com/test', 'It worked!', function(err) {
-//  console.log(err);
-//});
-
-http.createServer(function(req, res) {
+function handle(req, res) {
   if (req.url.substr(-1) === '/') {
     req.url += 'index.html';
     res.writeHead(200, {
       'Content-Type': 'text/html'
     });
   }
-  console.log('store.getItem', userName, 'content:'+sitepath+ req.url);
   store.getItem(userName, 'content:'+sitepath+ req.url, function(err, content) {
     res.end(content);
   });
+}
+
+store.getItem(userName, 'content:'+certpath+'/tls.key', function(err1, key) {
+  store.getItem(userName, 'content:'+certpath+'/tls.cert', function(err2, cert) {
+    store.getItem(userName, 'content:'+certpath+'/chain.pem', function(err3, chain) {
+      console.log(err1, err2, err3);
+      https.createServer({
+        key: key, 
+        cert: cert,
+        ca: chain
+      }, handle).listen(443);
+    });
+  });
+});
+
+http.createServer(function(req, res) {
+  res.writeHead(302, {
+    Location: 'https://michielbdejong.com'+req.url
+  });
+  res.end();
 }).listen(80);

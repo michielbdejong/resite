@@ -6,8 +6,17 @@ var fs = require('fs'),
     reStore = require('./vendor/restore'),
     store   = new reStore.FileTree({path: '../restore/storage'}),
     userName = 'michiel',
-    sitepath = '/public/www/michielbdejong.com',
     contentDir = '/root/michielbdejong.com/';
+    certDir = '/root/cert/';
+
+function importCert(_path) {
+  fs.readFile(certDir+_path, function(err, buf) {
+    store.putItem(userName, 'content:/tls/michielbdejong.com/'
+	+ _path, buf, function(err) {
+      console.log(err);
+    });
+  });
+}
 
 function importFile(_path) {
   fs.readFile(_path, function(err, buf) {
@@ -37,3 +46,6 @@ function importDir(currentDir) {
   });
 }
 importDir(contentDir);
+importCert('tls.key');
+importCert('tls.cert');
+importCert('chain.pem');
