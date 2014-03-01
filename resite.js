@@ -10,13 +10,23 @@ var http = require('http'),
     certpath = '/tls/michielbdejong.com';
 
 function handle(req, res) {
-  if (req.url.substr(-1) === '/') {
-    req.url += 'index.html';
+  var contentPath = 'content:' + sitepath + req.url.split('?')[0];
+  if (contentPath.substr(-1) === '/') {
+    contentPath += 'index.html';
+  }
+  if (contentPath.substr(-5) === '.html') {
     res.writeHead(200, {
-      'Content-Type': 'text/html'
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin': '*' 
+    });
+  } else if (req.url.split('?')[0] === '/.well-known/webfinger') {
+    res.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json'
     });
   }
-  store.getItem(userName, 'content:'+sitepath+ req.url, function(err, content) {
+  console.log('getting', contentPath);
+  store.getItem(userName, contentPath, function(err, content) {
     res.end(content);
   });
 }
