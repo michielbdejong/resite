@@ -7,8 +7,27 @@ var http = require('http'),
     store   = new reStore.FileTree({path: '../data/restore/storage'}),
     userName = 'michiel',
     sitepath = '/public/www/michielbdejong.com',
-    certpath = '/tls/michielbdejong.com';
+    certpath = '/tls/michielbdejong.com',
+    inboxpath = '/inbox/post-me-anything/';
 
+function postMeAnything(req, res) {
+  console.log('hit', req.url);
+  var str = '';
+  req.on('data', function(chunk) {
+    console.log('chunk', chunk.toString());
+    str += chunk.toString();
+  });
+  req.on('end', function() {
+    var msgPath = 'content:'+inboxpath+(new Date()).getTime().toString();
+    store.putItem(userName, msgPath, new Buffer(str), function(err) {
+      console.log('saved as', msgPath, str, err);
+      res.writeHead(202, {
+	'Access-Control-Allow-Origin': req.headers.origin || '*'
+      });
+      res.end('https://michielbdejong.com/blog/7.html#webmentions');
+    });
+  });
+}
 function handle(req, res) {
   console.log('request port 443', req.url);
   var contentPath = 'content:' + sitepath + req.url.split('?')[0];
@@ -36,6 +55,12 @@ store.getItem(userName, 'content:'+certpath+'/tls.key', function(err1, key) {
   store.getItem(userName, 'content:'+certpath+'/tls.cert', function(err2, cert) {
     store.getItem(userName, 'content:'+certpath+'/chain.pem', function(err3, chain) {
       console.log(err1, err2, err3);
+      https.createServer({
+        key: key, 
+        cert: cert,
+        ca: chain
+      }, postMeAnything).listen(7678);
+      console.log('port 7678 running');
       https.createServer({
         key: key, 
         cert: cert,
