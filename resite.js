@@ -3,12 +3,14 @@ process.env.DEBUG = true;
 
 var http = require('http'),
     https = require('https'),
+    fs = require('fs'),
+    mkdirp = require('mkdirp'),
     reStore = require('./vendor/restore'),
     store   = new reStore.FileTree({path: '../data/restore/storage'}),
     userName = 'michiel',
     sitepath = '/public/www/michielbdejong.com',
     certpath = '/tls/michielbdejong.com',
-    inboxpath = '/inbox/post-me-anything/';
+    inboxpath = '/data/inbox/post-me-anything/';
 
 function postMeAnything(req, res) {
   console.log('hit', req.url);
@@ -18,8 +20,8 @@ function postMeAnything(req, res) {
     str += chunk.toString();
   });
   req.on('end', function() {
-    var msgPath = 'content:'+inboxpath+(new Date()).getTime().toString();
-    store.putItem(userName, msgPath, new Buffer(str), function(err) {
+    var msgPath = inboxpath+(new Date()).getTime().toString();
+    fs.writeFile(msgPath, new Buffer(str), function(err) {
       console.log('saved as', msgPath, str, err);
       res.writeHead(202, {
 	'Access-Control-Allow-Origin': req.headers.origin || '*'
@@ -51,22 +53,24 @@ function handle(req, res) {
   });
 }
 
-store.getItem(userName, 'content:'+certpath+'/tls.key', function(err1, key) {
-  store.getItem(userName, 'content:'+certpath+'/tls.cert', function(err2, cert) {
-    store.getItem(userName, 'content:'+certpath+'/chain.pem', function(err3, chain) {
-      console.log(err1, err2, err3);
-      https.createServer({
-        key: key, 
-        cert: cert,
-        ca: chain
-      }, postMeAnything).listen(7678);
-      console.log('port 7678 running');
-      https.createServer({
-        key: key, 
-        cert: cert,
-        ca: chain
-      }, handle).listen(443);
-      console.log('port 443 running');
+mkdirp(inboxpath, function(err1) {
+  store.getItem(userName, 'content:'+certpath+'/tls.key', function(err2, key) {
+    store.getItem(userName, 'content:'+certpath+'/tls.cert', function(err3, cert) {
+      store.getItem(userName, 'content:'+certpath+'/chain.pem', function(err4, chain) {
+        console.log(err1, err2, err3, err4);
+        https.createServer({
+          key: key,
+          cert: cert,
+          ca: chain
+        }, postMeAnything).listen(7678);
+        console.log('port 7678 running');
+        https.createServer({
+          key: key,
+          cert: cert,
+          ca: chain
+        }, handle).listen(443);
+        console.log('port 443 running');
+      });
     });
   });
 });
