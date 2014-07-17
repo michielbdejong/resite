@@ -2,15 +2,13 @@ process.umask(077);
 process.env.DEBUG = true;
 
 var http = require('http'),
-    https = require('https'),
     fs = require('fs'),
     mkdirp = require('mkdirp'),
     reStore = require('./vendor/restore'),
-    store   = new reStore.FileTree({path: '../data/restore/storage'}),
-    userName = 'michiel',
-    sitepath = '/public/www/michielbdejong.com',
-    certpath = '/tls/michielbdejong.com',
-    inboxpath = '/data/inbox/post-me-anything/';
+    store   = new reStore.FileTree({path: '/data/resite/storage'}),
+    userName = 'me',
+    sitepath = '/public/www',
+    inboxpath = '/data/resite/inbox/post-me-anything/';
 
 function postMeAnything(req, res) {
   console.log('hit', req.url);
@@ -26,12 +24,12 @@ function postMeAnything(req, res) {
       res.writeHead(202, {
 	'Access-Control-Allow-Origin': req.headers.origin || '*'
       });
-      res.end('https://michielbdejong.com/blog/7.html#webmentions');
+      res.end('');//'https://michielbdejong.com/blog/7.html#webmentions');
     });
   });
 }
 function handle(req, res) {
-  console.log('request port 443', req.url);
+  console.log('request port 80', req.url);
   var contentPath = 'content:' + sitepath + req.url.split('?')[0];
   if (contentPath.substr(-1) === '/') {
     contentPath += 'index.html';
@@ -54,32 +52,7 @@ function handle(req, res) {
 }
 
 mkdirp(inboxpath, function(err1) {
-  store.getItem(userName, 'content:'+certpath+'/tls.key', function(err2, key) {
-    store.getItem(userName, 'content:'+certpath+'/tls.cert', function(err3, cert) {
-      store.getItem(userName, 'content:'+certpath+'/chain.pem', function(err4, chain) {
-        console.log(err1, err2, err3, err4);
-        https.createServer({
-          key: key,
-          cert: cert,
-          ca: chain
-        }, postMeAnything).listen(7678);
-        console.log('port 7678 running');
-        https.createServer({
-          key: key,
-          cert: cert,
-          ca: chain
-        }, handle).listen(443);
-        console.log('port 443 running');
-      });
-    });
-  });
+  console.log(err1);
+  http.createServer(handle).listen(80);
+  console.log('port 80 running');
 });
-
-http.createServer(function(req, res) {
-  console.log('request port 80', req.url);
-  res.writeHead(302, {
-    Location: 'https://michielbdejong.com'+req.url
-  });
-  res.end();
-}).listen(80);
-console.log('port 80 running');
