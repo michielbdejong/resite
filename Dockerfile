@@ -12,6 +12,4 @@ ADD . ./resite
 RUN cd resite && npm install
 
 CMD cd resite && node resite.js
-EXPOSE 443
 EXPOSE 80
-EXPOSE 7678
