@@ -1,7 +1,10 @@
 FROM ubuntu:precise
-RUN echo "deb http://archive.ubuntu.com/ubuntu precise universe" >> /etc/apt/sources.list
 RUN apt-get update
-RUN apt-get install -y python-software-properties python g++ make 
+RUN apt-get -y upgrade
+RUN apt-get install -y python
+RUN apt-get install -y make
+RUN apt-get install -y g++
+RUN apt-get install -y python-software-properties
 RUN add-apt-repository ppa:chris-lea/node.js
 RUN apt-get update
 RUN apt-get install -y nodejs
