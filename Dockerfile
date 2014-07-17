@@ -1,15 +1,9 @@
-FROM ubuntu:precise
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y python
-RUN apt-get install -y make
-RUN apt-get install -y g++
-RUN apt-get install -y python-software-properties
-RUN add-apt-repository ppa:chris-lea/node.js
-RUN apt-get update
-RUN apt-get install -y nodejs
-ADD . ./resite
-RUN cd resite && npm install
+FROM node
+ADD . /usr/src/app
+WORKDIR /usr/src/app
 
-CMD cd resite && node resite.js
+RUN npm install
+
 EXPOSE 80
+
+CMD [ "node", "server.js" ]
