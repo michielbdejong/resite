@@ -55,5 +55,6 @@ function handle(req, res) {
 mkdirp(inboxpath, function(err1) {
   console.log(err1);
   http.createServer(handle).listen(80);
+  http.createServer(postMeAnything).listen(7678);
   console.log('port 80 running');
 });
