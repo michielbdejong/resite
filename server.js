@@ -7,7 +7,7 @@ var http = require('http'),
     reStore = require('./vendor/restore'),
     store   = new reStore.FileTree({path: '/data/resite/storage'}),
     userName = 'me',
-    siteName = fs.readFileSync('/data/resite/sitename.txt'),
+    siteName = fs.readFileSync('/data/resite/sitename.txt').trim(),
     sitepath = '/public/www/'+siteName,
     inboxpath = '/data/resite/inbox/post-me-anything/';
 
