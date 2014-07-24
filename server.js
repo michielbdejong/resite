@@ -7,7 +7,7 @@ var http = require('http'),
     reStore = require('./vendor/restore'),
     store   = new reStore.FileTree({path: '/data/resite/storage'}),
     userName = 'me',
-    sitepath = '/public/www',
+    sitepath = '/public/www/michielbdejong.com',
     inboxpath = '/data/resite/inbox/post-me-anything/';
 
 function postMeAnything(req, res) {
