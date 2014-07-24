@@ -7,7 +7,8 @@ var http = require('http'),
     reStore = require('./vendor/restore'),
     store   = new reStore.FileTree({path: '/data/resite/storage'}),
     userName = 'me',
-    sitepath = '/public/www/michielbdejong.com',
+    siteName = fs.readFileSync('/data/resite/sitename.txt'),
+    sitepath = '/public/www/'+siteName,
     inboxpath = '/data/resite/inbox/post-me-anything/';
 
 function postMeAnything(req, res) {
@@ -24,7 +25,7 @@ function postMeAnything(req, res) {
       res.writeHead(202, {
 	'Access-Control-Allow-Origin': req.headers.origin || '*'
       });
-      res.end('');//'https://michielbdejong.com/blog/7.html#webmentions');
+      res.end('');
     });
   });
 }
