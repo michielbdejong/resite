@@ -12,7 +12,7 @@ var http = require('http'),
     inboxpath = '/data/resite/inbox/post-me-anything/';
 
 function postMeAnything(req, res) {
-  console.log('hit', req.url);
+  console.log('hit postMeAnything ', req.url);
   var str = '';
   req.on('data', function(chunk) {
     console.log('chunk', chunk.toString());
