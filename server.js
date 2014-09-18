@@ -7,8 +7,7 @@ var http = require('http'),
     reStore = require('./vendor/restore'),
     store   = new reStore.FileTree({path: '/data/resite/storage'}),
     userName = 'me',
-    siteName = fs.readFileSync('/data/resite/sitename.txt').toString().trim(),
-    sitepath = '/public/www/'+siteName,
+    sitepath = '/public/www/',
     inboxpath = '/data/resite/inbox/post-me-anything/';
 
 function postMeAnything(req, res) {
@@ -29,9 +28,9 @@ function postMeAnything(req, res) {
     });
   });
 }
-function handle(req, res) {
+function handle(req, res, port) {
   console.log('request port 80', req.url);
-  var contentPath = 'content:' + sitepath + req.url.split('?')[0];
+  var contentPath = 'content:' + sitepath + port + req.url.split('?')[0];
   if (contentPath.substr(-1) === '/') {
     contentPath += 'index.html';
   }
@@ -54,7 +53,15 @@ function handle(req, res) {
 
 mkdirp(inboxpath, function(err1) {
   console.log(err1);
-  http.createServer(handle).listen(80);
+  function startServer(portStr, portNo) {
+    http.createServer(function(req, res) {
+      return handle(req, res, portStr);
+    }).listen(portNo);
+  }
+  startServer('default', 80);
+  for (var i=8000; i<8010; i++) {
+    startServer(i.toString(), i);
+  }
   http.createServer(postMeAnything).listen(7678);
   console.log('port 80 running');
 });
