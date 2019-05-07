@@ -15,6 +15,8 @@ Compared with the original reStore, reSite uses the [remotestorage-server](http:
 
 ## License for the `vendor/` part:
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/michielbdejong/resite.svg)](https://greenkeeper.io/)
+
 (The MIT License)
 
 Copyright (c) 2012-2013 James Coglan
